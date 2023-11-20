@@ -15,8 +15,8 @@ app.secret_key = os.environ['SECRET_KEY'] = 'you will never guess'
 # db initialization
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
-db.init_app(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db' # relative path to the database file
+db.init_app(app) # initialize the database for the web app
 
 from app import models
 with app.app_context(): 

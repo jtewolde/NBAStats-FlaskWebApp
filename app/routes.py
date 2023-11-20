@@ -1,10 +1,12 @@
 from app import app, db, load_user
-from app.models import User
+from app.models import User, Team, Player, PlayerStatsPerGame, PlayerStatsTotal
 from app.forms import SignUpForm, SignInForm
 from flask import render_template, redirect, url_for, request
 from flask_login import login_required, login_user, logout_user, current_user
 import bcrypt, uuid
-from app.api import get_teams, get_players, get_player_total_stats, get_player_avg_stats
+from api import get_teams, get_team_roster, get_players, get_player_avg_stats, get_player_total_stats
+from nba_api.stats.static import players
+from nba_api.stats.endpoints import playercareerstats, commonplayerinfo
 
 @app.route('/')
 @app.route('/index')
@@ -61,7 +63,119 @@ def users_signout():
     return redirect(url_for('index'))
 
 @login_required
+@app.route('/players', methods=['GET', 'POST'])
+def show_players():
+    """This route handles the players page, displaying all NBA players."""
+    for player in get_players():
+        player_object = Player(
+            player_name=player['full_name'],
+            player_id=player['id']
+        )
+        if db.session.query(Player).filter_by(player_id=player['id']).count() == 0: # if the player does not exist in the database
+            db.session.add(player_object) # add the new player to the database
+            db.session.commit() # commit the changes
+    return render_template('players.html', players=get_players()) # render the players template
+    
+@login_required
 @app.route('/teams', methods=['GET', 'POST'])
 def teams():
     """This route handles the teams page, displaying all NBA teams."""
-    return render_template('teams.html', teams=get_teams())
+    for team in get_teams():
+        team_object = Team(
+            team_name=team['full_name'],
+            team_abbreviation=team['abbreviation'],
+            team_city=team['city'],
+            team_state=team['state'],
+            year_founded=team['year_founded']
+        )
+        db.session.add(team_object) # add the new team to the database
+
+    if db.session.query(Team).count() == 0: # if the database is empty
+        print('Database is empty!')
+        db.session.commit() # commit the changes
+
+    return render_template('teams.html', teams=get_teams()) # render the teams template
+
+@login_required
+@app.route('/players/stats', methods=['GET', 'POST'])
+def show_players_per_game_stats():
+    """ This route handles the player stats page, displaying all NBA players stats per game."""
+    player_name = request.args.get('player') # get the player name from the request
+    player_id = [player for player in players.get_active_players() if player['full_name'] == player_name][0]['id'] # get the player id from the player name
+
+    print(player_name)
+
+    player_stats = get_player_avg_stats(player_name) # get the player stats
+
+    player_avg_stats = PlayerStatsPerGame( # instantiate a new player stats object
+        player_id=player_id,
+        player_name=player_name,
+        player_points=player_stats['PTS'],
+        player_assists=player_stats['AST'], 
+        player_rebounds=player_stats['REB'], 
+        player_steals=player_stats['STL'],
+        player_blocks=player_stats['BLK'],
+        player_fg_percent=player_stats['FG%'],
+        player_fg3_percent=player_stats['FG3%'],
+        player_ft_percent=player_stats['FT%'],
+        player_turnovers=player_stats['TOV'],
+        player_games_played=player_stats['GP']
+    )
+
+    print(player_avg_stats)
+    print(player_stats)
+
+    if db.session.query(PlayerStatsPerGame).filter_by(player_name=player_name).count() == 0: # if the player does not exist in the database
+        db.session.add(player_avg_stats) # add the new player to the database
+        db.session.commit() # commit the changes
+    return render_template('avg_stats.html', player_stats=player_stats, player_name=player_name) # render the player stats template
+
+
+@login_required
+@app.route('/players/stats/total', methods=['GET', 'POST'])
+def show_players_total_stats():
+    """ This route handles the player stats page, displaying all NBA players stats per game."""
+    player_name = request.args.get('player') # get the player name from the request
+    player_id = [player for player in players.get_active_players() if player['full_name'] == player_name][0]['id']
+    print(player_name)
+
+    player_stats = get_player_total_stats(player_name) # get the player stats
+
+    player_total_stats = PlayerStatsTotal( # instantiate a new player stats object
+        player_id=player_id,
+        player_name=player_name,
+        player_points=player_stats['PTS'],
+        player_assists=player_stats['AST'], 
+        player_rebounds=player_stats['REB'], 
+        player_steals=player_stats['STL'],
+        player_blocks=player_stats['BLK'],
+        player_fg_attempts=player_stats['FGA'],
+        player_fg_made=player_stats['FGM'],
+        player_fg3_attempts=player_stats['FG3A'],
+        player_fg3_made=player_stats['FG3M'],
+        player_ft_attempts=player_stats['FTA'],
+        player_ft_made=player_stats['FTM'],
+        player_turnovers=player_stats['TOV'],
+        player_games_played=player_stats['GP']
+    )
+
+    print(player_total_stats)
+    print(player_stats)
+
+    if db.session.query(PlayerStatsTotal).filter_by(player_name=player_name).count() == 0: # if the player does not exist in the database
+        db.session.add(player_total_stats)
+        db.session.commit()
+    return render_template('total_stats.html', player_stats=player_stats, player_name=player_name) # render the player stats template
+
+@login_required
+@app.route('/roster', methods=['GET', 'POST'])
+def teams_roster():
+    """ This route handles the roster page, displaying all players in a given team. """
+    team = request.args.get('team') # get the team name from the request
+  
+    print(team) # print the team name
+
+    roster = get_team_roster(team) # get the team roster
+    return render_template('roster.html', roster=roster, team_name=team)
+
+###################################### HELPER FUNCTIONS ######################################

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>Total Player Stats for {{ player_name }} </h1>
+    <table>
+        <tr>
+            <th>Points</th>
+            <th>Assists</th>
+            <th>Rebounds</th>
+            <th>Steals</th>
+            <th>Blocks</th>
+            <th>Field Goals Attempted</th>
+            <th>Field Goals Made</th>
+            <th>3-Point Field Goals Attempted</th>
+            <th>3-Point Field Goals Made</th>
+            <th>Free Throws Attempted</th>
+            <th>Free Throws Made</th>
+            <th>Turnovers</th>
+            <th>Games Played</th>
+        </tr>
+        <tr>
+            <td>{{ player_stats.PTS }}</td>
+            <td>{{ player_stats.AST }}</td>
+            <td>{{ player_stats.REB }}</td>
+            <td>{{ player_stats.STL }}</td>
+            <td>{{ player_stats.BLK }}</td>
+            <td>{{ player_stats['FGA'] }}</td>
+            <td>{{ player_stats['FGM'] }}</td>
+            <td>{{ player_stats['FG3A'] }}</td>
+            <td>{{ player_stats['FG3M'] }}</td>
+            <td>{{ player_stats['FTA'] }}</td>
+            <td>{{ player_stats['FTM'] }}</td>
+            <td>{{ player_stats.TOV }}</td>
+            <td>{{ player_stats.GP }}</td>
+        </tr>
+    </table>
+{% endblock %}

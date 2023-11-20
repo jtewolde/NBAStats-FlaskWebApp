@@ -2,10 +2,16 @@
 {% block main %}
     <h1>All NBA Teams</h1>
     <p />
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players') }}")>View All Players</button>
     <table>
         <tr>
             <th>Team Name</th>
-            <th>Team Logo</th>
+            <th>Team Abbreviation</th>
+            <th>Team City</th>
+            <th>Team State</th>
+            <th>Year Founded</th>
+            <th>Logo</th>
+            <th>View Roster</th>
         </tr>
         {% for team in teams %}
             {% if loop.index % 2 == 0 %}
@@ -13,11 +19,18 @@
             {% else %}
                 <tr class="odd_row">
             {% endif %}
-                <td>{{ team }}</td>
+                <td>{{ team.full_name }}</td>
+                <td>{{ team.abbreviation }}</td>
+                <td>{{ team.city }}</td>
+                <td>{{ team.state }}</td>
+                <td>{{ team.year_founded }}</td>
+                <td><img src="{{ url_for('static', filename='nbalogos/' + team['full_name'].replace(' ', '-') + '.png') }}" alt="{{ team['team_name'] }}" width="100" height="100"></td>
+                <td><button type="button" class="button" onclick=simple_action("{{ url_for('teams_roster', team=team.full_name) }}")>View Roster</button></td>
             </tr>
         {% endfor %}
     </table>
     <p />
+<div>
     <script type="text/javascript">
         function simple_action(target) {
             window.location = target
