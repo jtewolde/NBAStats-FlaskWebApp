@@ -79,7 +79,8 @@ def get_player_avg_stats(player_name):
 
     career = playercareerstats.PlayerCareerStats(player_id=player_id)
     career_df = career.get_data_frames()[0]
-    stats_df = career_df[career_df['SEASON_ID'] == '2023-24']
+    stats_df = career_df[career_df['SEASON_ID'] == '2023-24'] # Get the stats for the 2023-24 season
+
     stats_df = stats_df[['PTS', 'AST', 'REB', 'STL', 'BLK', 'GP', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'TOV']]
     
     # Calculate per game averages
@@ -103,6 +104,47 @@ def get_player_avg_stats(player_name):
 
     # print(player_name) # Print the player name
     return stats_dict # Return the dictionary
+    
+
+def get_player_avg_stats_career(player_name):
+    """ This function will return a dictionary of the stats per game for each season of a given player's career."""
+    active_players = players.get_active_players()
+
+    matching_players = [player for player in active_players if player['full_name'] == player_name] # Get the player
+
+    if not matching_players: # If the player does not exist
+        print("This player does not exist!")
+        return None
+
+    player = matching_players[0]# Get the player ID
+    player_id = player['id'] # Get the player ID
+
+    career = playercareerstats.PlayerCareerStats(player_id=player_id)
+    career_df = career.get_data_frames()[0]
+
+    # Extract relevant columns
+    stats_df = career_df[['SEASON_ID', 'PTS', 'AST', 'REB', 'STL', 'BLK', 'GP', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'TOV']]
+
+    # Calculate per game averages
+    stats_df.loc[:, 'PTS'] /= stats_df['GP']
+    stats_df.loc[:, 'AST'] /= stats_df['GP']
+    stats_df.loc[:, 'REB'] /= stats_df['GP']
+    stats_df.loc[:, 'STL'] /= stats_df['GP']
+    stats_df.loc[:, 'BLK'] /= stats_df['GP']
+    stats_df.loc[:, 'FG%'] = stats_df['FGM'] / stats_df['FGA'] * 100
+    stats_df.loc[:, 'FG3%'] = stats_df['FG3M'] / stats_df['FG3A'] * 100
+    stats_df.loc[:, 'FT%'] = stats_df['FTM'] / stats_df['FTA'] * 100
+    stats_df.loc[:, 'TOV'] /= stats_df['GP']
+    
+    # Drop the 'GP' column as it's no longer needed
+    stats_df = stats_df[['SEASON_ID', 'PTS', 'AST', 'REB', 'STL', 'BLK', 'FG%', 'FG3%', 'FT%', 'TOV', 'GP']]
+    stats_df = stats_df.round(1) # Round all values to 1 decimal place
+
+    # Convert the per game averages to a list of dictionaries
+    stats_list = stats_df.to_dict('records')
+
+    return stats_list # Return the list of dictionaries
+
 
 def get_team_roster(team_name):
     """ This function will return a list of all players for a given team."""
@@ -131,6 +173,7 @@ def get_team_roster(team_name):
 def get_gamelog(player_name):
     """ This function will return a dataframe of the gamelog for a given player."""
     active_players = players.get_active_players()
+    print(player_name)
 
     matching_players = [player for player in active_players if player['full_name'] == player_name] # Get the player
 
@@ -144,20 +187,30 @@ def get_gamelog(player_name):
     gamelog = playergamelog.PlayerGameLog(player_id=player_id)
     gamelog_df = gamelog.get_data_frames()[0]
 
-    return gamelog_df
+    gamelog_df['FG_PCT'] = gamelog_df['FG_PCT'] * 100 # Convert the FG% to a percentage
+    gamelog_df['FG3_PCT'] = gamelog_df['FG3_PCT'] * 100 # Convert the FG3% to a percentage
+    gamelog_df['FT_PCT'] = gamelog_df['FT_PCT'] * 100 # Convert the FT% to a percentage
+
+    gamelog_df['FG_PCT'] = gamelog_df['FG_PCT'].round(1) # Round the FG% to 1 decimal place
+    gamelog_df['FG3_PCT'] = gamelog_df['FG3_PCT'].round(1) # Round the FG3% to 1 decimal place
+    gamelog_df['FT_PCT'] = gamelog_df['FT_PCT'].round(1) # Round the FT% to 1 decimal place
+
+    gamelog_list = gamelog_df[['GAME_DATE', 'MATCHUP', 'WL', 'PTS', 'AST', 'REB', 'OREB','DREB', 'STL', 'BLK', 'FG_PCT', 'FGM', 'FGA', 'FG3_PCT', 'FG3M', 'FG3A', 'FT_PCT', 'FTM', 'FTA', 'TOV', 'PF', 'PLUS_MINUS', 'MIN']] # Extract relevant columns
+    gamelog_list = gamelog_list.to_dict('records') # Convert the dataframe to a list of dictionaries
+
+    return gamelog_list # Return the list of dictionaries
 
 if __name__ == "__main__":
     # print(get_team_roster('Portland Trail Blazers'))
 
-    print(get_player_total_stats('Nikola Jokic'))
-    print(get_player_total_stats('LeBron James'))  # These lines will return the total stats for the 2023-24 season
-    print(get_player_total_stats('Stephen Curry'))
+    # print(get_player_total_stats('Nikola Jokic'))
+    # print(get_player_total_stats('LeBron James'))  # These lines will return the total stats for the 2023-24 season
+    # print(get_player_total_stats('Stephen Curry'))
 
     # print(get_player_avg_stats('Stephen Curry'))
     # print(get_player_avg_stats('Nikola Jokic'))  # These lines will return the per game averages for the 2023-24 season
     # print(get_player_avg_stats('LeBron James'))
     # print(get_player_avg_stats('Kevin Durant'))
 
-    # print(get_gamelog('Stephen Curry'))
-
-    # print(get_teams())  # This line will return a list of all NBA teams
+    print(get_player_avg_stats_career('Stephen Curry'))
+    

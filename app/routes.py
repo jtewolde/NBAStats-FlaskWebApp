@@ -4,7 +4,7 @@ from app.forms import SignUpForm, SignInForm
 from flask import render_template, redirect, url_for, request
 from flask_login import login_required, login_user, logout_user, current_user
 import bcrypt, uuid
-from api import get_teams, get_team_roster, get_players, get_player_avg_stats, get_player_total_stats
+from api import get_teams, get_team_roster, get_players, get_player_avg_stats, get_player_total_stats, get_gamelog, get_player_avg_stats_career
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playercareerstats, commonplayerinfo
 
@@ -178,4 +178,21 @@ def teams_roster():
     roster = get_team_roster(team) # get the team roster
     return render_template('roster.html', roster=roster, team_name=team)
 
-###################################### HELPER FUNCTIONS ######################################
+@login_required
+@app.route('/players/gamelog', methods=['GET', 'POST'])
+def show_players_gamelog():
+    """ This route handles the gamelog page, displaying the gamelog of a given player. """
+    player_name = request.args.get('player') # get the player name from the request
+   
+    player_gamelog = get_gamelog(player_name) # get the player gamelog
+    return render_template('game_log.html', gamelog=player_gamelog, player_name=player_name)
+
+@login_required
+@app.route('/players/career', methods=['GET', 'POST'])
+def show_players_career():
+    """ This route handles the career page, displaying the career stats of a given player. """
+    player_name = request.args.get('player') # get the player name from the request
+
+    player_career_stats = get_player_avg_stats_career(player_name) # get the player career stats
+    return render_template('career_stats.html', career_stats=player_career_stats, player_name=player_name)
+
