@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>Latest League Standings of the 2023-2024 Standings</h1>
+    <p />
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players') }}")>View All Players</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_teams') }}")>View All Teams</button>
+    <table>
+        <tr>
+            <th>Team ID</th>
+            <th>Team City</th>
+            <th>Team Name</th>
+            <th>Conference</th>
+            <th>Conference Record</th>
+            <th>Division</th>
+            <th>Division Record</th>
+            <th>Current Record</th>
+            <th>Playoff Rank</th>
+            <th>Win%</th>
+            <th>Home Record</th>
+            <th>Road Record</th>
+            <th>Last 10 Games</th>
+            <th>Streak</th>
+            <th>Logo</th>
+        </tr>
+        {% for team in standings %}
+            {% if loop.index % 2 == 0 %}
+                <tr class="even_row">
+            {% else %}
+                <tr class="odd_row">
+            {% endif %}
+                <td>{{ team['TeamID'] }}</td>
+                <td>{{ team['TeamCity'] }}</td>
+                <td>{{ team['TeamName'] }}</td>
+                <td>{{ team['Conference'] }}</td>
+                <td>{{ team['ConferenceRecord'] }}</td>
+                <td>{{ team['Division'] }}</td>
+                <td>{{ team['DivisionRecord'] }}</td>
+                <td>{{ team['Record'] }}</td>
+                <td>{{ team['PlayoffRank'] }}</td>
+                <td>{{ team['WinPCT'] }}</td>
+                <td>{{ team['HOME'] }}</td>
+                <td>{{ team['ROAD'] }}</td>
+                <td>{{ team['L10'] }}</td>
+                <td>{{ team['CurrentStreak'] }}</td>
+                <td><img src="{{ url_for('static', filename='nbalogos/' + team['TeamCity'].replace(' ', '-') + '-' + team['TeamName'].replace(' ', '-') +'.png') }}" alt="{{ team['TeamName'] }}" width="100" height="100"></td>
+            </tr>
+        {% endfor %}
+    </table>
+    <p />
+<div>
+    <script type="text/javascript">
+        function simple_action(target) {
+            window.location = target
+        }
+    </script>
+{% endblock %}

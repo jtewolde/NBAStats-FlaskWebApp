@@ -4,7 +4,7 @@ from app.forms import SignUpForm, SignInForm
 from flask import render_template, redirect, url_for, request
 from flask_login import login_required, login_user, logout_user, current_user
 import bcrypt, uuid
-from api import get_teams, get_team_roster, get_players, get_player_avg_stats, get_player_total_stats, get_gamelog, get_player_avg_stats_career
+from api import get_teams, get_team_roster, get_players, get_player_avg_stats, get_player_total_stats, get_gamelog, get_player_avg_stats_career, get_league_standings
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playercareerstats, commonplayerinfo
 
@@ -195,4 +195,12 @@ def show_players_career():
 
     player_career_stats = get_player_avg_stats_career(player_name) # get the player career stats
     return render_template('career_stats.html', career_stats=player_career_stats, player_name=player_name)
+
+@login_required
+@app.route('/league/standings', methods=['GET', 'POST'])
+def show_league_standings():
+    """ This route handles the standings page, displaying the league standings. """
+
+    league_standings = get_league_standings()
+    return render_template('league_standings.html', standings=league_standings)
 

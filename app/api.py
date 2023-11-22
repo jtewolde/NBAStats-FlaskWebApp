@@ -7,7 +7,7 @@ Description: This is a web app that will display NBA stats for the 2023-2024 sea
 
 from nba_api.stats.static import teams, players
 from nba_api import stats
-from nba_api.stats.endpoints import playercareerstats, commonplayerinfo, playergamelog
+from nba_api.stats.endpoints import playercareerstats, commonplayerinfo, playergamelog, commonteamroster, leaguestandings
 from pandas import DataFrame
 # from models import User, Team, Player, PlayerStatsPerGame
 # from app import db
@@ -148,26 +148,21 @@ def get_player_avg_stats_career(player_name):
 
 def get_team_roster(team_name):
     """ This function will return a list of all players for a given team."""
-    nba_players = get_players()  # Get all NBA players
-    nba_teams = get_teams()  # Get all NBA teams
-    team = next((t for t in nba_teams if t['full_name'] == team_name), None)  # Get the team that matches the team name
+    nba_teams = teams.get_teams()
+    matching_teams = [team for team in nba_teams if team['full_name'] == team_name] # Get the team
 
-    team_roster = []  # Initialize an empty list for the team roster
+    if not matching_teams: # If the team does not exist
+        print("This team does not exist!")
+        return None
 
-    if team:  # If the team exists
-        player_team_abbreviation = team['abbreviation'] # Get the team abbreviation
+    team = matching_teams[0] # Get the team ID
+    team_id = team['id'] # Get the team ID
 
-        for player in nba_players:  # For each player
-            player_info = commonplayerinfo.CommonPlayerInfo(player_id=player['id']) # Get the player info
-            player_info_df = player_info.get_data_frames()[0] # Convert the player info to a dataframe
-            player_team = player_info_df['TEAM_ABBREVIATION'].iloc[0] # Get the player's team abbreviation
+    roster = commonteamroster.CommonTeamRoster(team_id=team_id)
+    roster_df = roster.get_data_frames()[0]
+    roster_list = roster_df[['PLAYER', 'NUM', 'POSITION', 'HEIGHT', 'WEIGHT', 'BIRTH_DATE', 'AGE', 'EXP', 'SCHOOL']].to_dict('records') # Extract relevant columns
 
-            if player_team == player_team_abbreviation: # If the player's team abbreviation matches the team abbreviation
-                print("Player added to team roster: ")
-                print(player_info_df['DISPLAY_FIRST_LAST'].iloc[0]) # Print the player's name
-                team_roster.append(player_info_df['DISPLAY_FIRST_LAST'].iloc[0])  # Add the player to the team roster
-
-    return team_roster # Return the team roster
+    return roster_list # Return the list of dictionaries
 
    
 def get_gamelog(player_name):
@@ -200,6 +195,25 @@ def get_gamelog(player_name):
 
     return gamelog_list # Return the list of dictionaries
 
+def get_league_standings():
+    """ This function will return a dataframe of the league standings."""
+    standings = leaguestandings.LeagueStandings() # Get the league standings
+    standings_df = standings.get_data_frames()[0] # Convert the standings to a dataframe
+
+    standings_df = standings_df[['TeamID', 'TeamCity', 'TeamName', 'Conference', 'ConferenceRecord', 'Division', 'DivisionRecord', 'PlayoffRank', 'Record', 'WinPCT', 'HOME', 'ROAD', 'L10', 'CurrentStreak']] # Extract relevant columns
+
+    # standings_df['ConferenceRecord'] = standings_df['ConferenceRecord'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the ConferenceRecord column
+    # standings_df['DivisionRecord'] = standings_df['DivisionRecord'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the DivisionRecord column
+    # standings_df['L10'] = standings_df['L10'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the L10 column
+
+
+    standings_df = standings_df.round(3) # Round all values to 3 decimal places
+
+    standings_list = standings_df.to_dict('records') # Convert the dataframe to a list of dictionaries
+
+    return standings_list # Return the list of dictionaries
+
+
 if __name__ == "__main__":
     # print(get_team_roster('Portland Trail Blazers'))
 
@@ -212,5 +226,6 @@ if __name__ == "__main__":
     # print(get_player_avg_stats('LeBron James'))
     # print(get_player_avg_stats('Kevin Durant'))
 
-    print(get_player_avg_stats_career('Stephen Curry'))
+    print(get_team_roster('Portland Trail Blazers'))
+    print(get_league_standings())
     

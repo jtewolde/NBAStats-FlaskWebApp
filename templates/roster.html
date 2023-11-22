@@ -1,11 +1,18 @@
 {% extends 'base.html' %}
 {% block main %}
-    <h1>{{ team_name['full_name'] }} Roster</h1>
+    <h1>{{ team_name }}'s 2023-2024 Roster</h1>
     <p />
     <table>
         <tr>
-            <th>Player's Name</th>
-            <th>View Player's Stats</th>
+            <th>Player</th>
+            <th>Jersey Number</th>
+            <th>Position</th>
+            <th>Height</th>
+            <th>Weight</th>
+            <th>Age</th>
+            <th>Experience</th>
+            <th>School</th>
+            <th>View Per Game Statistics</th>
         </tr>
         {% for player in roster %}
             {% if loop.index % 2 == 0 %}
@@ -13,12 +20,21 @@
             {% else %}
                 <tr class="odd_row">
             {% endif %}
-                <td>{{ player }}</td>
-                <td><button type="button" class="button" onclick=simple_action("{{ url_for('show_players_per_game_stats', player=player) }}")>View Stats</button></td>
+                <td>{{ player['PLAYER'] }}</td>
+                <td>{{ player['NUM'] }}</td>
+                <td>{{ player['POSITION'] }}</td>
+                <td>{{ player['HEIGHT'] }}</td>
+                <td>{{ player['WEIGHT'] }}</td>
+                <td>{{ player['AGE'] }}</td>
+                <td>{{ player['EXP'] }}</td>
+                <td>{{ player['SCHOOL'] }}</td>
+                <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_per_game_stats', player=player['PLAYER']) }}")>View Per Game Stats</button>
             </tr>   
         {% endfor %}
     </table>
     <p />
+<div>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players') }}")>View All Players</button>
     <script type="text/javascript">
         function simple_action(target) {
             window.location = target

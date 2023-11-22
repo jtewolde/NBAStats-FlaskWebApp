@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 {% block main %}
-    Welcome to the NBA Statistics Database Web App!
+    <h1>
+    <div style= "text-align: center">
+        Welcome to the NBA Stats Database Web App!
     <p />
 
-    <img src="{{ url_for('static', filename='nba_players.jpg') }}" alt="NBA Logo" width="450" height="450">
+    <div style= "text-align: center">
+        <img src="{{ url_for('.static', filename='nba_players.jpg') }}" alt="NBA Logo" width="550" height="550">
 
     <p />
     Please, choose an option below:

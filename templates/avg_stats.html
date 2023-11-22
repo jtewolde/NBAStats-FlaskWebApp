@@ -27,4 +27,16 @@
             <td>{{ player_stats.GP }}</td>
         </tr>
     </table>
+    <p />
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players', player=player_name) }}")>Go back to Players List</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_total_stats', player=player_name) }}")>View Total Stats</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_gamelog', player=player_name) }}")>View Game Log</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_career', player=player_name) }}")>View Career Stats</button>
+</div>
+<script type="text/javascript">
+    function simple_action(target) {
+        window.location = target;
+    }
+</script>
+
 {% endblock %}
