@@ -4,6 +4,8 @@
     <table>
         <tr>
             <th>Season</th>
+            <th>Team Abbreviation</th>
+            <th>Age</th>
             <th>Points</th>
             <th>Assists</th>
             <th>Rebounds</th>
@@ -22,6 +24,8 @@
                 <tr class="odd_row">
             {% endif %}
                 <td>{{ season['SEASON_ID'] }}</td>
+                <td>{{ season['TEAM_ABBREVIATION'] }}</td>
+                <td>{{ season['PLAYER_AGE'] }}</td>
                 <td>{{ season['PTS'] }}</td>
                 <td>{{ season['AST'] }}</td>
                 <td>{{ season['REB'] }}</td>

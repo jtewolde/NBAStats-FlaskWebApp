@@ -1,18 +1,20 @@
 from app import app, db, load_user
 from app.models import User, Team, Player, PlayerStatsPerGame, PlayerStatsTotal
 from app.forms import SignUpForm, SignInForm
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for, request, flash
 from flask_login import login_required, login_user, logout_user, current_user
 import bcrypt, uuid
 from api import get_teams, get_team_roster, get_players, get_player_avg_stats, get_player_total_stats, get_gamelog, get_player_avg_stats_career, get_league_standings
+from api import get_western_standings, get_eastern_standings
 from nba_api.stats.static import players
 from nba_api.stats.endpoints import playercareerstats, commonplayerinfo
+
 
 @app.route('/')
 @app.route('/index')
 @app.route('/index.html')
 def index(): 
-    return render_template('index.html')
+    return render_template('index.html', user = current_user)
 
 @app.route('/users/signin', methods=['GET', 'POST'])
 def users_signin():
@@ -22,10 +24,11 @@ def users_signin():
         user = User.query.filter_by(id=form.id.data).first() # check if the user exists using the id
         if user and bcrypt.checkpw(form.passwd.data.encode('utf-8'), user.passwd): # if the user exists and the password matches
             login_user(user) # login the user
+            flash('You were successfully logged in!')
             return redirect(url_for('teams')) # redirect the user to the orders page
         else:
-            return '<p>Sorry, the user id and/or password are incorrect!</p>' # print an error message
-    return render_template('signin.html', form=form) # render the signin template if the form was not submitted or it is not valid
+            flash('Invalid username/password combination')
+    return render_template('signin.html', form=form, user = current_user) # render the signin template if the form was not submitted or it is not valid
 
 @app.route('/users/signup', methods=['GET', 'POST'])
 def users_signup():
@@ -35,7 +38,7 @@ def users_signup():
     if form.validate_on_submit(): # if the form was submitted and it is valid
         existing_user = User.query.filter_by(id=form.id.data).first() # check if the user already exists using the id
         if existing_user: # if the user already exists
-            return '<p>Sorry, this user id is already taken!</p>' # print an error message
+            flash('The user already exists!') # flash a message
 
         passwd = form.passwd.data # get the password from the form
         passwd_confirm = form.passwd_confirm.data # get the password confirmation from the form
@@ -49,10 +52,11 @@ def users_signup():
             db.session.add(new_user) # add the new user to the database
             db.session.commit() # commit the changese
 
+            flash('You were successfully registered!') # flash a message
             return redirect(url_for('users_signin')) # redirect the user to the signin page
         else: # if the password and the password confirmation do not match
-            return '<p>Sorry, the password and the password confirmation do not match!</p>'
-    return render_template('signup.html', form=form) # render the signup template if the form was not submitted or it is not valid
+            flash('The passwords do not match!')
+    return render_template('signup.html', form=form, user = current_user) # render the signup template if the form was not submitted or it is not valid
 
     
 @login_required
@@ -60,6 +64,7 @@ def users_signup():
 def users_signout():
     """This route handles the signout process, logging out the user and redirecting the user to the index page."""
     logout_user()
+    flash('You were successfully logged out!')
     return redirect(url_for('index'))
 
 @login_required
@@ -74,6 +79,7 @@ def show_players():
         if db.session.query(Player).filter_by(player_id=player['id']).count() == 0: # if the player does not exist in the database
             db.session.add(player_object) # add the new player to the database
             db.session.commit() # commit the changes
+    flash('Directed to Players Page')
     return render_template('players.html', players=get_players()) # render the players template
     
 @login_required
@@ -94,6 +100,7 @@ def teams():
         print('Database is empty!')
         db.session.commit() # commit the changes
 
+    flash('Directed to Teams Page')
     return render_template('teams.html', teams=get_teams()) # render the teams template
 
 @login_required
@@ -128,6 +135,8 @@ def show_players_per_game_stats():
     if db.session.query(PlayerStatsPerGame).filter_by(player_name=player_name).count() == 0: # if the player does not exist in the database
         db.session.add(player_avg_stats) # add the new player to the database
         db.session.commit() # commit the changes
+
+    flash('Directed to Player Stats Page of ' + player_name + '')
     return render_template('avg_stats.html', player_stats=player_stats, player_name=player_name) # render the player stats template
 
 
@@ -165,6 +174,8 @@ def show_players_total_stats():
     if db.session.query(PlayerStatsTotal).filter_by(player_name=player_name).count() == 0: # if the player does not exist in the database
         db.session.add(player_total_stats)
         db.session.commit()
+
+    flash('Directed to Total Stats Page of ' + player_name + '')
     return render_template('total_stats.html', player_stats=player_stats, player_name=player_name) # render the player stats template
 
 @login_required
@@ -176,6 +187,8 @@ def teams_roster():
     print(team) # print the team name
 
     roster = get_team_roster(team) # get the team roster
+
+    flash('Directed to Roster Page of ' + team + '')
     return render_template('roster.html', roster=roster, team_name=team)
 
 @login_required
@@ -185,6 +198,8 @@ def show_players_gamelog():
     player_name = request.args.get('player') # get the player name from the request
    
     player_gamelog = get_gamelog(player_name) # get the player gamelog
+
+    flash('Directed to Gamelog Page of ' + player_name + '')
     return render_template('game_log.html', gamelog=player_gamelog, player_name=player_name)
 
 @login_required
@@ -194,6 +209,8 @@ def show_players_career():
     player_name = request.args.get('player') # get the player name from the request
 
     player_career_stats = get_player_avg_stats_career(player_name) # get the player career stats
+
+    flash('Directed to Career Stats Page of ' + player_name + '')
     return render_template('career_stats.html', career_stats=player_career_stats, player_name=player_name)
 
 @login_required
@@ -202,5 +219,27 @@ def show_league_standings():
     """ This route handles the standings page, displaying the league standings. """
 
     league_standings = get_league_standings()
+
+    flash('Directed to League Standings Page')
     return render_template('league_standings.html', standings=league_standings)
+
+@login_required
+@app.route('/west/standings', methods=['GET', 'POST'])
+def show_west_standings():
+    """ This route handles the standings page, displaying the league standings. """
+
+    west_standings = get_western_standings()
+
+    flash('Directed to Western Conference Standings Page')
+    return render_template('western_standings.html', weststandings=west_standings)
+
+@login_required
+@app.route('/east/standings', methods=['GET', 'POST'])
+def show_east_standings():
+    """ This route handles the standings page, displaying the league standings. """
+
+    east_standings = get_eastern_standings()
+
+    flash('Directed to Eastern Conference Standings Page')
+    return render_template('eastern_standings.html', eaststandings=east_standings)
 

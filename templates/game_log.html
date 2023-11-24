@@ -35,7 +35,11 @@
             {% endif %}
                 <td>{{ game['GAME_DATE'] }}</td>
                 <td>{{ game['MATCHUP'] }}</td>
-                <td>{{ game['WL'] }}</td>
+                {% if game['WL'] == 'W' %}
+                    <td style="background-color: #00FF00">{{ game['WL'] }}</td>
+                {% else %}
+                    <td style="background-color: #FF0000">{{ game['WL'] }}</td>
+                {% endif %}
                 <td>{{ game['MIN'] }}</td>
                 <td>{{ game['FGM'] }}</td>
                 <td>{{ game['FGA'] }}</td>

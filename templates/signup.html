@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
 {% block main %}
+    <h1>
+    <div style= "text-align: center">
+        Sign Up for the NBA Stats Database Web App!
         <form action="" method="POST" novalidate>
             {{ form.hidden_tag() }}
             <p>{{ form.id.label }} <br> {{ form.id(size=15) }}</p>

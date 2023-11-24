@@ -7,7 +7,7 @@ Description: This is a web app that will display NBA stats for the 2023-2024 sea
 
 from nba_api.stats.static import teams, players
 from nba_api import stats
-from nba_api.stats.endpoints import playercareerstats, commonplayerinfo, playergamelog, commonteamroster, leaguestandings
+from nba_api.stats.endpoints import playercareerstats, commonplayerinfo, playergamelog, commonteamroster, leaguestandings, teamgamelog
 from pandas import DataFrame
 # from models import User, Team, Player, PlayerStatsPerGame
 # from app import db
@@ -123,7 +123,7 @@ def get_player_avg_stats_career(player_name):
     career_df = career.get_data_frames()[0]
 
     # Extract relevant columns
-    stats_df = career_df[['SEASON_ID', 'PTS', 'AST', 'REB', 'STL', 'BLK', 'GP', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'TOV']]
+    stats_df = career_df[['SEASON_ID', 'TEAM_ABBREVIATION', 'PLAYER_AGE', 'PTS', 'AST', 'REB', 'STL', 'BLK', 'GP', 'FGM', 'FGA', 'FG3M', 'FG3A', 'FTM', 'FTA', 'TOV']]
 
     # Calculate per game averages
     stats_df.loc[:, 'PTS'] /= stats_df['GP']
@@ -137,7 +137,7 @@ def get_player_avg_stats_career(player_name):
     stats_df.loc[:, 'TOV'] /= stats_df['GP']
     
     # Drop the 'GP' column as it's no longer needed
-    stats_df = stats_df[['SEASON_ID', 'PTS', 'AST', 'REB', 'STL', 'BLK', 'FG%', 'FG3%', 'FT%', 'TOV', 'GP']]
+    stats_df = stats_df[['SEASON_ID', 'TEAM_ABBREVIATION', 'PLAYER_AGE', 'PTS', 'AST', 'REB', 'STL', 'BLK', 'FG%', 'FG3%', 'FT%', 'TOV', 'GP']]
     stats_df = stats_df.round(1) # Round all values to 1 decimal place
 
     # Convert the per game averages to a list of dictionaries
@@ -213,6 +213,46 @@ def get_league_standings():
 
     return standings_list # Return the list of dictionaries
 
+def get_western_standings():
+    """ This function will return a dataframe of the western conference standings."""
+    standings = leaguestandings.LeagueStandings() # Get the league standings
+    standings_df = standings.get_data_frames()[0] # Convert the standings to a dataframe
+
+    standings_df = standings_df[['TeamID', 'TeamCity', 'TeamName', 'Conference', 'ConferenceRecord', 'Division', 'DivisionRecord', 'PlayoffRank', 'Record', 'WinPCT', 'HOME', 'ROAD', 'L10', 'CurrentStreak']] # Extract relevant columns
+
+    standings_df = standings_df[standings_df['Conference'] == 'West'] # Get only the western conference standings
+
+    # standings_df['ConferenceRecord'] = standings_df['ConferenceRecord'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the ConferenceRecord column
+    # standings_df['DivisionRecord'] = standings_df['DivisionRecord'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the DivisionRecord column
+    # standings_df['L10'] = standings_df['L10'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the L10 column
+
+
+    standings_df = standings_df.round(3) # Round all values to 3 decimal places
+
+    standings_list = standings_df.to_dict('records') # Convert the dataframe to a list of dictionaries
+
+    return standings_list # Return the list of dictionaries
+
+def get_eastern_standings():
+    """ This function will return a dataframe of the eastern conference standings."""
+    standings = leaguestandings.LeagueStandings() # Get the league standings
+    standings_df = standings.get_data_frames()[0] # Convert the standings to a dataframe
+
+    standings_df = standings_df[['TeamID', 'TeamCity', 'TeamName', 'Conference', 'ConferenceRecord', 'Division', 'DivisionRecord', 'PlayoffRank', 'Record', 'WinPCT', 'HOME', 'ROAD', 'L10', 'CurrentStreak']] # Extract relevant columns
+
+    standings_df = standings_df[standings_df['Conference'] == 'East'] # Get only the eastern conference standings
+
+    # standings_df['ConferenceRecord'] = standings_df['ConferenceRecord'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the ConferenceRecord column
+    # standings_df['DivisionRecord'] = standings_df['DivisionRecord'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the DivisionRecord column
+    # standings_df['L10'] = standings_df['L10'].str.replace('-', ' - ') # Replace the '-' with ' - ' in the L10 column
+
+
+    standings_df = standings_df.round(3) # Round all values to 3 decimal places
+
+    standings_list = standings_df.to_dict('records') # Convert the dataframe to a list of dictionaries
+
+    return standings_list # Return the list of dictionaries
+
 
 if __name__ == "__main__":
     # print(get_team_roster('Portland Trail Blazers'))
@@ -226,6 +266,7 @@ if __name__ == "__main__":
     # print(get_player_avg_stats('LeBron James'))
     # print(get_player_avg_stats('Kevin Durant'))
 
-    print(get_team_roster('Portland Trail Blazers'))
-    print(get_league_standings())
+    print(get_player_avg_stats_career('Damian Lillard')) # This line will return the per game averages for each season of a given player's career
+    
+
     

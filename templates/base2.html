@@ -30,17 +30,13 @@
         </button>
         <div class="collapse navbar-collapse" id="navbar">
           <div class="navbar-nav">
-            {% if current_user.is_authenticated %}
+            <a class="nav-item nav-link" href="{{ url_for('index') }}">Home</a>
             <a class="nav-item nav-link" href="{{ url_for('show_players') }}">Players</a>
             <a class="nav-item nav-link" href="{{ url_for('teams') }}">Teams</a>
-            <a class="nav-item nav-link" href="{{ url_for('show_league_standings') }}">League Standings</a>
             <a class="nav-item nav-link" href="{{ url_for('show_east_standings') }}">Eastern Standings</a>
             <a class="nav-item nav-link" href="{{ url_for('show_west_standings') }}">Western Standings</a>
-            <a class="nav-item nav-link" href="{{ url_for('users_signout') }}">Logout</a>
-            {% else %}
             <a class="nav-item nav-link" href="{{ url_for('users_signin') }}">Sign In</a>
             <a class="nav-item nav-link" href="{{ url_for('users_signup') }}">Sign Up</a>
-            {% endif %}
           </div>
         </div>
     </nav>

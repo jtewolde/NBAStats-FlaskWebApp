@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block main %}
-    <h1>Latest League Standings of the 2023-2024 Standings</h1>
+    <h1>Latest Eastern Standings of the 2023-2024 Regular Season</h1>
     <p />
     <button type="button" class="button" onclick=simple_action("{{ url_for('show_players') }}")>View All Players</button>
     <button type="button" class="button" onclick=simple_action("{{ url_for('teams') }}")>View All Teams</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_west_standings') }}")>View Western Standings</button>
     <table>
         <tr>
             <th>Team ID</th>
@@ -22,7 +23,7 @@
             <th>Streak</th>
             <th>Logo</th>
         </tr>
-        {% for team in standings %}
+        {% for team in eaststandings %}
             {% if loop.index % 2 == 0 %}
                 <tr class="even_row">
             {% else %}
