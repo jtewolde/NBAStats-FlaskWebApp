@@ -37,6 +37,7 @@
     <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_per_game_stats', player=player_name) }}")>View Per Game Stats</button>
     <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_gamelog', player=player_name) }}")>View Game Log</button>
     <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_career', player=player_name) }}")>View Career Stats</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_postseason', player=player_name) }}")>View Postseason Stats</button>
 </div>
 <script type="text/javascript">
     function simple_action(target) {

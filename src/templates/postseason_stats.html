@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block main %}
+    <h1>{{ player_name }}'s Postseason Averages</h1>
+    <table>
+        <tr>
+            <th>Season</th>
+            <th>Team Abbreviation</th>
+            <th>Age</th>
+            <th>Points</th>
+            <th>Assists</th>
+            <th>Rebounds</th>
+            <th>Steals</th>
+            <th>Blocks</th>
+            <th>Field Goal Percentage</th>
+            <th>3-Point Field Goal Percentage</th>
+            <th>Free Throw Percentage</th>
+            <th>Turnovers</th>
+            <th>Games Played</th>
+        </tr>
+        {% for season in player_stats %}
+            {% if loop.index % 2 == 0 %}
+                <tr class="even_row">
+            {% else %}
+                <tr class="odd_row">
+            {% endif %}
+                <td>{{ season['SEASON_ID'] }}</td>
+                <td>{{ season['TEAM_ABBREVIATION'] }}</td>
+                <td>{{ season['PLAYER_AGE'] }}</td>
+                <td>{{ season['PTS'] }}</td>
+                <td>{{ season['AST'] }}</td>
+                <td>{{ season['REB'] }}</td>
+                <td>{{ season['STL'] }}</td>
+                <td>{{ season['BLK'] }}</td>
+                <td>{{ season['FG%'] }}%</td>
+                <td>{{ season['FG3%'] }}%</td>
+                <td>{{ season['FT%'] }}%</td>
+                <td>{{ season['TOV'] }}</td>
+                <td>{{ season['GP'] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players', player=player_name) }}")>Go back to Players List</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_total_stats', player=player_name) }}")>View Total Stats</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_per_game_stats', player=player_name) }}")>View Per Game Stats</button>
+    <button type="button" class="button" onclick=simple_action("{{ url_for('show_players_gamelog', player=player_name) }}")>View Game Log</button>
+</div>
+<script type="text/javascript">
+    function simple_action(target) {
+        window
+        .location
+        = target;
+    }
+</script>
+{% endblock %}
