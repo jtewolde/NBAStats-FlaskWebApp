@@ -33,7 +33,7 @@ This Python project utilizes Flask, a web framework, to create a dynamic web app
 2. **Create a virtual environment:**
 
     ```bash
-    virtualenv venv
+    virtualenv venv or python -m venv venv # For Windows
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     ```
 
@@ -56,6 +56,7 @@ This Python project utilizes Flask, a web framework, to create a dynamic web app
 1. **Run the application:**
 
     ```bash
+    set PYTHONPATH=app # export PYTHONPATH=app for MAC
     flask run
     ```
 
