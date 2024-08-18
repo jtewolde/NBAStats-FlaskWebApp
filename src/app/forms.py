@@ -10,7 +10,7 @@ from wtforms import StringField, PasswordField, TextAreaField, DateField, Submit
 from wtforms.validators import DataRequired
 
 class SignUpForm(FlaskForm):
-    id = StringField('Id', validators=[DataRequired()])
+    id = StringField('ID', validators=[DataRequired()])
     email_address = StringField('Email')
     about = TextAreaField('About')
     passwd = PasswordField('Password', validators=[DataRequired()])
@@ -18,6 +18,6 @@ class SignUpForm(FlaskForm):
     submit = SubmitField('Confirm')
 
 class SignInForm(FlaskForm):
-    id = StringField('Id', validators=[DataRequired()])
+    id = StringField('ID', validators=[DataRequired()])
     passwd = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Confirm')

@@ -1,15 +1,89 @@
 {% extends 'base.html' %}
 {% block main %}
-    <h1>
-    <div style= "text-align: center">
-        Sign Up for the NBA Stats Database Web App!
+    <style>
+        body {
+            background-image: url("{{ url_for('.static', filename='sga_ant.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            font-family: 'Arial', sans-serif;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .signup-container {
+            max-width: 450px;
+            margin: 100px auto;
+            padding: 50px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            text-align: left;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #FFD700;
+            text-align: center;
+            margin-bottom: 30px;
+            text-decoration: underline;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        label {
+            font-size: 18px;
+            color: #ffffff;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            resize: vertical; /* Allows vertical resizing */
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #ffcc00;
+        }
+    </style>
+
+    <div class="signup-container">
+        <h1>Sign Up for the NBA Stats Database</h1>
+        
         <form action="" method="POST" novalidate>
             {{ form.hidden_tag() }}
-            <p>{{ form.id.label }} <br> {{ form.id(size=15) }}</p>
-            <p>{{ form.email_address.label }} <br> {{ form.email_address(size=30) }}</p>
-            <p>{{ form.about.label }} <br> {{ form.about(size=30) }}</p>
-            <p>{{ form.passwd.label }} <br> {{ form.passwd(size=30) }}</p>
-            <p>{{ form.passwd_confirm.label }} <br> {{ form.passwd_confirm(size=30) }}</p>
-            <p>{{ form.submit() }}</p>
+            <p>{{ form.id.label }} <br> {{ form.id(size=30, class_='form-input') }}</p>
+            <p>{{ form.email_address.label }} <br> {{ form.email_address(size=30, class_='form-input') }}</p>
+            <p>{{ form.about.label }} <br> {{ form.about(size=30, class_='form-input', rows=4) }}</p>
+            <p>{{ form.passwd.label }} <br> {{ form.passwd(size=30, class_='form-input') }}</p>
+            <p>{{ form.passwd_confirm.label }} <br> {{ form.passwd_confirm(size=30, class_='form-input') }}</p>
+            <p>{{ form.submit(class_='form-submit') }}</p>
         </form>
+    </div>
 {% endblock %}
